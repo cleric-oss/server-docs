@@ -97,8 +97,11 @@ function editAccount(
 );
 ```
 
-Edit the password or level of a user account and invalidate all auth keys for that username. Used by admins via a CLI or portal.  
+Edit the password or level of a user account. Used by admins via a CLI or portal.  
 To change username create a new account and manually transfer ownership.
+
+> [!CAUTION]  
+> The user will be signed out across all devices if the password is changed
 
 ### Delete account
 
@@ -114,6 +117,9 @@ function deleteAccount(username: string):
 ```
 
 Remove an account and invalidate all auth keys for the username. Data is not deleted and must be moved or deleted by an admin.
+
+> [!WARNING]  
+> There is ***no*** confirmation for this function
 
 ### Create auth key
 
