@@ -1,4 +1,4 @@
-# DB Api
+# Data Api
 
 ## read/write files to/from JS Objects
 
