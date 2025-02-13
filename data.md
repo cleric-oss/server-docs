@@ -1,11 +1,38 @@
-# Data Api
+# Data Adapter API
 
 ## read/write files to/from JS Objects
 
-### Read
+### Load data
 
 ```ts
-function read(id: string): {
+function open(id: string): File;
+
+interface File {
+  read;
+  readRaw;
+  write;
+  writeRaw;
+}
+```
+
+Load data at the id. The ID is unique to the data and often structured as a file path. This is used to access the data.
+
+#### List IDs
+
+```ts
+function list(asFile: false): string[];
+function list(asFile: true): File[];
+function list(asFile: boolean): (string | File)[];
+```
+
+Get a list of all IDs
+
+### Read
+
+#### Read Object
+
+```ts
+function File.read(): {
   state: "clean" | "dirty" | undefined;
   data: { [key: any]: unknown } | Buffer;
 };
@@ -14,11 +41,23 @@ function read(id: string): {
 Loads data using the `id` passed to the function. This is unique to the data and is created by a `write` call. (This will often be structured as a file path)  
 If `state` is `clean` that means the data was last written using `write`. If `state` is `dirty` data was last written using `writeRaw`. If `state` is `undefined`, then it is not known what the data was last written with
 
-### Write
+#### Read Raw
 
 ```ts
-function write(
-  id: string,
+function File.readRaw(): unknown;
+```
+
+Read the data at the location as is. The data will typically be a string or raw binary, however this could be different if stored in raw memory.
+
+> [!WARNING]  
+> It is not recommended to use this data unless debugging issues or if the data was written using `writeRaw`
+
+### Write
+
+#### Write Object
+
+```ts
+function File.write(
   data: { [key: any]: unknown }
 ):
   | {
@@ -30,24 +69,12 @@ function write(
     };
 ```
 
-Writes data to a location determined by ID. Data should always be retrievable using the same ID and not another ID. Data is passed as a JS object to ease use of multiple formats. The data should be marked as `clean` if the adapter supports that.
+Writes data to a location determined by ID. Data should always be retrievable using the same ID and not another ID. Data is passed as a JS object to ease use of multiple formats. T if the adapter supports that.
 
-### Read raw
-
-```ts
-function readRaw(id: string): unknown;
-```
-
-Read the data at the location as is. The data will typically be a string or raw binary, however this could be different if stored in raw memory.
-
-> [!WARNING]  
-> It is not recommended to use this data unless debugging issues or if the data was written using `writeRaw`
-
-### Write Raw
+#### Write Raw
 
 ```ts
-function writeRaw(
-  id: string,
+function File.writeRaw(
   data: string | Buffer
 ):
   | {
@@ -59,7 +86,7 @@ function writeRaw(
     };
 ```
 
-Write the data to the location as is. The data must be a string or raw binary. This should mark data as `dirty` if the adapter supports that.
+Write the data to the location as is. The data must be a string or raw binary. This should mark data as `dirty`.
 
 > [!CAUTION]  
 > This can cause bugs for data loaded with `read`. Be careful using this function.
@@ -92,7 +119,7 @@ function editAccount(
   username: string,
   edit: {
     password?: string; // SHA256 not plaintext
-    level?: "visitor" | "player" | "master" | "admin";
+    level?: "guest" | "player" | "master" | "admin";
   }
 );
 ```
@@ -119,7 +146,7 @@ function deleteAccount(username: string):
 Remove an account and invalidate all auth keys for the username. Data is not deleted and must be moved or deleted by an admin.
 
 > [!WARNING]  
-> There is ***no*** confirmation for this function
+> There is **_no_** confirmation for this function
 
 ### Create auth key
 
@@ -134,7 +161,7 @@ function createKey(
   features: [] | string[],
   // timeout after n days, 30 by default
   // if the auth expires a user needs to log in again
-  timeout: number = 30, 
+  timeout: number = 30
 ):
   | {
       success: true;
@@ -145,6 +172,8 @@ function createKey(
       error: unknown;
     };
 ```
+
+Auth keys can be used to access an account without username or password and should be used to store access or generate auth tokens (for bots).
 
 1. Check if the password matches the username and is valid.
 2. Generate a new unused ID (don't use an ID which is now invalid either)
