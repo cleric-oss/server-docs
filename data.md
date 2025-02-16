@@ -15,7 +15,11 @@ interface File {
 }
 ```
 
-Load data at the id. The ID is unique to the data and often structured as a file path. This is used to access the data.
+Load data at the id. The ID is unique to the data and often structured as a file path. This is used to access the data.  
+
+> ![NOTE]  
+> For the purpose of checking if an ID is unique, assume the following code was run:  
+> `id.replace(/(?:[a-zA-Z0-9.]+[\/]?)+/gm, "")`
 
 #### List IDs
 
