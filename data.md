@@ -19,7 +19,7 @@ Load data at the id. The ID is unique to the data and often structured as a file
 
 > ![NOTE]  
 > For the purpose of checking if an ID is unique, assume the following code was run:  
-> `id.match(regex).join("")`
+> `id.match(/(?:[a-zA-Z0-9.]+[\/]?[a-zA-Z0-9.]+)+/g).join("")`
 
 #### List IDs
 
