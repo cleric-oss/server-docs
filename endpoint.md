@@ -5,6 +5,8 @@
 ```ts
 // static class
 interface Endpoint {
+  // segments with a : at the start are path parameters
+  // invalid paths throw an error
   get(path: string): EmptyEndpoint;
   post(path: string): EmptyEndpoint;
   delete(path: string): EmptyEndpoint;
@@ -14,16 +16,19 @@ interface Endpoint {
 interface EmptyEndpoint {
   // not parsed, not validated, and not responded
   parse(fn: (body: string) => Object): UnvalidatedEndpoint;
-  validate(
+  validate<T>(
     // JSON.parse returns an Object
-    fn: (obj: Object) => any
-  ): UnrespondedEndpoint<ReturnType<typeof fn>>;
+    // params are the segments with a colon
+    // ie path `/c/:character/` would have the parameter `character`
+    fn: (obj: Object, params: Record<string, string>) => T
+  ): UnrespondedEndpoint<T>;
   respond(
     fn: (
       req: Readonly<{
         headers: Headers;
         // JSON.parse returns an Object
         body: Object;
+        params: Record<string, string>;
       }>,
       res: NetworkResponse
     ) => NetworkResponse
@@ -32,16 +37,17 @@ interface EmptyEndpoint {
 
 interface UnvalidatedEndpoint {
   // parsed but not validated or responded
-  validate(
+  validate<T>(
     // parsed value could be anything
-    fn: (obj: any) => any
-  ): UnrespondedEndpoint<ReturnType<typeof fn>>;
+    fn: (obj: any, params: Record<string, string>) => T
+  ): UnrespondedEndpoint<T>;
   respond(
     fn: (
       req: {
         headers: Headers;
         // parsed value could be anything
         body: any;
+        params: Record<string, string>;
       },
       res: NetworkResponse
     ) => NetworkResponse
