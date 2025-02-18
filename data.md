@@ -5,21 +5,47 @@
 ### Load data
 
 ```ts
-function open(id: string): File;
+abstract class Data {
+  constructor(id: string) {};
+  abstract get id(): string;
 
-interface File {
-  read;
-  readRaw;
-  write;
-  writeRaw;
+  abstract read(): {
+    state: "clean" | "dirty" | undefined;
+    data: Record<any, unknown> | string | Buffer;
+  };
+  abstract readRaw(): unknown;
+  
+  abstract write(data: Object): 
+    | {
+        success: boolean;
+      }
+    | {
+        success: false;
+        error: unknown;
+      };
+  abstract writeRaw(data: string | Buffer): 
+    | {
+        success: boolean;
+      }
+    | {
+        success: false;
+        error: unknown;
+      }
 }
 ```
 
 Load data at the id. The ID is unique to the data and often structured as a file path. This is used to access the data.  
+You can access the ID with `Data.id`
 
 > ![NOTE]  
-> For the purpose of checking if an ID is unique, assume the following code was run:  
-> `id.match(/(?:[a-zA-Z0-9.]+[\/]?[a-zA-Z0-9.]+)+/g).join("")`
+> For the purpose of checking if an ID is unique, the following should be performed:
+>
+> 1. remove all chars except from `a-z`, `A-Z`, `0-9`, `.`, `\`, & `/`
+> 2. turn all slashes to `/`
+> 3. replace sequences of `/` with a single `/`
+> 4. discard `/`s at the start and end
+
+See the definitions of the methods further in the document.
 
 #### List IDs
 
