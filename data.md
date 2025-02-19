@@ -64,10 +64,10 @@ Get a list of all IDs
 #### Read Object
 
 ```ts
-async function Data.read(): {
+function async Data.read(): Promise<{
   state: "clean" | "dirty" | undefined;
   data: Object;
-};
+}>;
 ```
 
 Loads data using the `id` passed to the function. This is unique to the data and is created by a `write` call. (This will often be structured as a file path)  
@@ -76,7 +76,7 @@ If `state` is `clean` that means the data was last written using `write`. If `st
 #### Read Raw
 
 ```ts
-async function Data.readRaw(): Blob;
+function async Data.readRaw(): Promise<Blob>;
 ```
 
 Read the data at the location as is. The data will typically be a string or raw binary, however this could be different if stored in raw memory.
@@ -89,14 +89,15 @@ Read the data at the location as is. The data will typically be a string or raw 
 #### Write Object
 
 ```ts
-function Data.write(data: Object):
+function async Data.write(data: Object): Promise<
   | {
       success: boolean;
     }
   | {
       success: false;
       error: unknown;
-    };
+    }
+>;
 ```
 
 Writes data to a location determined by ID. Data should always be retrievable using the same ID and not another ID. Data is passed as a JS object to ease use of multiple formats. T if the adapter supports that.
@@ -104,14 +105,15 @@ Writes data to a location determined by ID. Data should always be retrievable us
 #### Write Raw
 
 ```ts
-function Data.writeRaw(data: string | Buffer):
+function async Data.writeRaw(data: string | Buffer): Promise<
   | {
       success: boolean;
     }
   | {
       success: false;
       error: unknown;
-    };
+    }
+>;
 ```
 
 Write the data to the location as is. The data must be a string or raw binary. This should mark data as `dirty`.
