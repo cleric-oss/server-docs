@@ -9,28 +9,30 @@ abstract class Data {
   constructor(id: string) {}
   abstract get id(): string;
 
-  abstract async read(): {
+  abstract async read(): Promise<{
     state: "clean" | "dirty" | undefined;
     data: Object;
-  };
-  abstract async readRaw(): Blob;
+  }>;
+  abstract async readRaw(): Promise<Blob>;
 
-  abstract write(data: Object):
+  abstract async write(data: Object): Promise<
     | {
         success: boolean;
       }
     | {
         success: false;
         error: unknown;
-      };
-  abstract writeRaw(data: string | Buffer):
+      }
+  >;
+  abstract async writeRaw(data: string | Buffer): Promise<
     | {
         success: boolean;
       }
     | {
         success: false;
         error: unknown;
-      };
+      }
+  >;
 }
 ```
 
