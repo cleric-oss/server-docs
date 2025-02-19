@@ -6,16 +6,16 @@
 
 ```ts
 abstract class Data {
-  constructor(id: string) {};
+  constructor(id: string) {}
   abstract get id(): string;
 
-  abstract read(): {
+  abstract async read(): {
     state: "clean" | "dirty" | undefined;
-    data: Record<any, unknown> | string | Buffer;
+    data: Object;
   };
-  abstract readRaw(): unknown;
-  
-  abstract write(data: Object): 
+  abstract async readRaw(): Blob;
+
+  abstract write(data: Object):
     | {
         success: boolean;
       }
@@ -23,21 +23,21 @@ abstract class Data {
         success: false;
         error: unknown;
       };
-  abstract writeRaw(data: string | Buffer): 
+  abstract writeRaw(data: string | Buffer):
     | {
         success: boolean;
       }
     | {
         success: false;
         error: unknown;
-      }
+      };
 }
 ```
 
 Load data at the id. The ID is unique to the data and often structured as a file path. This is used to access the data.  
 You can access the ID with `Data.id`
 
-> ![NOTE]  
+> [!NOTE]  
 > For the purpose of checking if an ID is unique, the following should be performed:
 >
 > 1. remove all chars except from `a-z`, `A-Z`, `0-9`, `.`, `\`, & `/`
@@ -62,9 +62,9 @@ Get a list of all IDs
 #### Read Object
 
 ```ts
-function File.read(): {
+async function Data.read(): {
   state: "clean" | "dirty" | undefined;
-  data: { [key: any]: unknown } | Buffer;
+  data: Object;
 };
 ```
 
@@ -74,7 +74,7 @@ If `state` is `clean` that means the data was last written using `write`. If `st
 #### Read Raw
 
 ```ts
-function File.readRaw(): unknown;
+async function Data.readRaw(): Blob;
 ```
 
 Read the data at the location as is. The data will typically be a string or raw binary, however this could be different if stored in raw memory.
@@ -87,9 +87,7 @@ Read the data at the location as is. The data will typically be a string or raw 
 #### Write Object
 
 ```ts
-function File.write(
-  data: { [key: any]: unknown }
-):
+function Data.write(data: Object):
   | {
       success: boolean;
     }
@@ -104,9 +102,7 @@ Writes data to a location determined by ID. Data should always be retrievable us
 #### Write Raw
 
 ```ts
-function File.writeRaw(
-  data: string | Buffer
-):
+function Data.writeRaw(data: string | Buffer):
   | {
       success: boolean;
     }
