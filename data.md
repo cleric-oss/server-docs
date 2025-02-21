@@ -17,7 +17,7 @@ abstract class Data {
 
   abstract async write(data: Object): Promise<
     | {
-        success: boolean;
+        success: true;
       }
     | {
         success: false;
@@ -91,14 +91,13 @@ Read the data at the location as is. The data will typically be a string or raw 
 ```ts
 function async Data.write(data: Object): Promise<
   | {
-      success: boolean;
+      success: true;
     }
   | {
       success: false;
       error: unknown;
     }
->;
-```
+>;```
 
 Writes data to a location determined by ID. Data should always be retrievable using the same ID and not another ID. Data is passed as a JS object to ease use of multiple formats. T if the adapter supports that.
 
